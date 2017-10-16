@@ -1,0 +1,68 @@
+﻿@model ShouldITweet.Models.Tweet
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<div class="container">
+    <div class="row" style="margin-top:20px;"></div>
+    <div class="row">
+        @using (Html.BeginForm("Index", "Home", FormMethod.Post))
+        {
+            HtmlHelper.UnobtrusiveJavaScriptEnabled = true;
+            @Html.AntiForgeryToken()
+            <div class="alert-danger">@Html.ValidationSummary()</div>
+            <div class="form-group">
+                @Html.TextAreaFor(m => m.TweetMessage, new { cols = "20", rows = "5" })
+                <br />
+                <span id="spnTweetCharacterCount"></span>
+
+            </div>
+            <div class="form-group">
+                <button type="submit" id="btnPost">Post</button>
+            </div>
+        }
+    </div>
+    <div class="row">
+
+        @if (ViewBag.isValid != null)
+        {
+            if ((bool)ViewBag.isValid)
+            {
+                <h1 class="alert-success">The Tweet does not contain any problematic phrases.</h1>
+            }
+            else
+            {
+                <h1 class="alert-danger">The Tweet does contain some problematic phrases. Please correct it.</h1>
+            }
+        }
+    </div>
+</div>
+@section scripts{
+    <script>
+        $(document).ready(function () {
+            // set the limit for tweet message length
+            var wordCharacterLimit = 140;
+
+            // Initialise the character counter
+            displayRemainingCharacters($('#TweetMessage').val().length);
+
+            // Decrement the character counter to show remaining characters as the user types in the text input.
+            $('body').on('keyup', '#TweetMessage', function (ev) {
+                displayRemainingCharacters($('#TweetMessage').val().length);
+            });
+
+            // Calulation logic to update the character count
+            function displayRemainingCharacters(tweetlength) {
+                var tweetlength = $('#TweetMessage').val().length;
+
+                if ((wordCharacterLimit - tweetlength) < 0) {
+                    $('#spnTweetCharacterCount').text('Please restrict your message to 140 characters. Actual Characters Length ' + tweetlength);
+                }
+                else {
+                    $('#spnTweetCharacterCount').text((wordCharacterLimit - tweetlength) + ' characters remaining.');
+                }
+                
+            }
+        });
+    </script>
+}
